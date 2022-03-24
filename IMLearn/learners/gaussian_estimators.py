@@ -1,12 +1,15 @@
 from __future__ import annotations
 import numpy as np
+import numpy.random
 from numpy.linalg import inv, det, slogdet
+from matplotlib import pyplot as plt
 
 
 class UnivariateGaussian:
     """
     Class for univariate Gaussian Distribution Estimator
     """
+
     def __init__(self, biased_var: bool = False) -> UnivariateGaussian:
         """
         Estimator for univariate Gaussian mean and variance parameters
@@ -51,8 +54,8 @@ class UnivariateGaussian:
         Sets `self.mu_`, `self.var_` attributes according to calculated estimation (where
         estimator is either biased or unbiased). Then sets `self.fitted_` attribute to `True`
         """
-        raise NotImplementedError()
-
+        self.mu_ = np.average(X)
+        self.var_ = np.var(X)
         self.fitted_ = True
         return self
 
@@ -76,7 +79,8 @@ class UnivariateGaussian:
         """
         if not self.fitted_:
             raise ValueError("Estimator must first be fitted before calling `pdf` function")
-        raise NotImplementedError()
+        exponent = np.exp(-1 * np.divide(np.power(X - self.mu_, 2), (2 * self.var_)))
+        return np.multiply((1 / np.sqrt(2 * np.pi * self.var_)), exponent)
 
     @staticmethod
     def log_likelihood(mu: float, sigma: float, X: np.ndarray) -> float:
@@ -97,13 +101,20 @@ class UnivariateGaussian:
         log_likelihood: float
             log-likelihood calculated
         """
-        raise NotImplementedError()
+        var = sigma ** 2
+        exponent = np.exp(-1 * np.divide(np.power(X - mu, 2), (2 * var)))
+        y = np.multiply((1 / np.sqrt(2 * np.pi * var)), exponent)
+        summery = 0
+        for elem in y:
+            summery +=np.log2(elem)
+        return summery
 
 
 class MultivariateGaussian:
     """
     Class for multivariate Gaussian Distribution Estimator
     """
+
     def __init__(self):
         """
         Initialize an instance of multivariate Gaussian estimator
@@ -143,8 +154,8 @@ class MultivariateGaussian:
         Sets `self.mu_`, `self.cov_` attributes according to calculated estimation.
         Then sets `self.fitted_` attribute to `True`
         """
-        raise NotImplementedError()
-
+        self.mu_ = np.mean(X, axis=0)
+        self.cov_ = np.cov(X.T)
         self.fitted_ = True
         return self
 
@@ -168,7 +179,13 @@ class MultivariateGaussian:
         """
         if not self.fitted_:
             raise ValueError("Estimator must first be fitted before calling `pdf` function")
-        raise NotImplementedError()
+        d = len(self.mu_)
+        divider = 1 / (((2 * np.pi) ** d) * det(self.cov_))
+        f_arr = []
+        for x in X:
+            power = -0.5 * np.matmul(np.matmul((x - self.mu_).T, self.cov_.T), (x - self.mu_))
+            f_arr.append(divider * np.exp(power.item()))
+        return f_arr
 
     @staticmethod
     def log_likelihood(mu: np.ndarray, cov: np.ndarray, X: np.ndarray) -> float:
@@ -189,4 +206,23 @@ class MultivariateGaussian:
         log_likelihood: float
             log-likelihood calculated over all input data and under given parameters of Gaussian
         """
-        raise NotImplementedError()
+        d = len(mu)
+        divider = 1 / (((2 * np.pi) ** d) * det(cov))
+        f_arr = []
+        for x in X:
+            power = -0.5 * np.matmul(np.matmul((x - mu).T, cov.T), (x - mu))
+            f_arr.append(+divider * np.exp(power.item()))
+        summery =0
+        for i in range(len (f_arr)):
+            summery += np.log2(f_arr[i])
+        # if prod == 0:
+        #     return 0
+        # return prod
+        return summery
+
+
+if __name__ == "__main__":
+    Q_3_array = np.array([1, 5, 2, 3, 8, -4, -2, 5, 1, 10, -10, 4, 5, 2, 7, 1, 1, 3, 2, -1, -3, 1, -4, 1, 2, 1,
+                          -4, -4, 1, 3, 2, 6, -6, 8, 3, -6, 4, 1, -2, 3, 1, 4, 1, 4, -2, 3, -1, 0, 3, 5, 0, -2])
+    print("mu=1 : {}".format(UnivariateGaussian.log_likelihood(1, 1, Q_3_array)))
+    print("mu=10 : {}".format(UnivariateGaussian.log_likelihood(10, 1, Q_3_array)))
