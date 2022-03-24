@@ -4,13 +4,11 @@ import numpy as np
 # import plotly.io as pio
 from matplotlib import pyplot as plt
 
+
 # pio.templates.default = "simple_white"
 
 
 def test_univariate_gaussian():
-
-
-
     # Question 1 - Draw samples and print fitted model
     mu = 10
     sigma = 1
@@ -32,7 +30,6 @@ def test_univariate_gaussian():
     plt.ylabel("Absolute distance from real value")
     plt.title("The different errors according to different sample size.")
     plt.show()
-
 
     # Question 3 - Plotting Empirical PDF of fitted model
     univariategaussian = UnivariateGaussian().fit(np.random.normal(loc=mu, scale=sigma, size=1000))
@@ -59,7 +56,7 @@ def test_multivariate_gaussian():
     print(mvg.cov_)
 
     # Question 5 - Likelihood evaluation
-    f2 = f1 = np.linspace(-10, 10, 200)
+    f3 = f1 = np.linspace(-10, 10, 200)
     y = np.zeros(shape=(200, 200))
     b = True
     max = 0
@@ -67,7 +64,7 @@ def test_multivariate_gaussian():
     samples = np.random.multivariate_normal(mu, cov, 1000)
     for i in range(200):
         for j in range(200):
-            mu = np.array([f1[i], 0, f2[j], 0]).T
+            mu = np.array([f1[i], 0, f3[j], 0]).T
             y[i][j] = MultivariateGaussian.log_likelihood(mu, cov, samples)
             if b:
                 max = y[i][j]
@@ -76,7 +73,11 @@ def test_multivariate_gaussian():
                 max = y[i][j]
                 maxi = (i, j)
 
-    plt.imshow(y)
+    plt.imshow(y, extent=[-10, 10, -10, 10])
+    plt.title("log-likelihood as a function of f1 and f3")
+    plt.colorbar()
+    plt.xlabel("feature 3")
+    plt.ylabel("feature 1")
     plt.show()
 
     # Question 6 - Maximum likelihood
