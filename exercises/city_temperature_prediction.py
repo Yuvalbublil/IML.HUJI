@@ -75,7 +75,7 @@ if __name__ == '__main__':
         polynomialfitter = PolynomialFitting(k)
         polynomialfitter.fit(x_train.to_numpy(), y_train.to_numpy())
         loss.append(np.round(polynomialfitter.loss(x_test.to_numpy(), y_test.to_numpy()), 2))
-        print("{}: loss = {}".format(k, loss[-1]))
+        print("k= {}: loss = {}".format(k, loss[-1]))
     plt.bar(list(range(1, 11)), loss)
     plt.xticks(np.arange(1, 11))
     plt.xlabel("k")

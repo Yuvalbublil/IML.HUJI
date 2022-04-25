@@ -31,6 +31,7 @@ class Perceptron(BaseEstimator):
             A callable to be called after each update of the model while fitting to given data
             Callable function should receive as input a Perceptron instance, current sample and current response
     """
+
     def __init__(self,
                  include_intercept: bool = True,
                  max_iter: int = 1000,
@@ -45,6 +46,7 @@ class Perceptron(BaseEstimator):
 
         max_iter: int, default = 1000
             Maximum number of passes over training data
+
 
         callback: Callable[[Perceptron, np.ndarray, int], None]
             A callable to be called after each update of the model while fitting to given data
@@ -73,12 +75,28 @@ class Perceptron(BaseEstimator):
         -----
         Fits model with or without an intercept depending on value of `self.fit_intercept_`
         """
-        raise NotImplementedError()
+        if self.include_intercept_:
+            extra_col = np.ones((len(y), 1))
+            X = np.hstack((extra_col, X))
+        def inner_step():
+            for i in range(len(y)):
+                if y[i] * np.dot(self.coefs_, X[i]) <= 0:
+                    self.coefs_ = self.coefs_ + y[i] * X[i]
+                    self.callback_(self, X[i], y[i])
+                    return True, self.coefs_
+            return False, self.coefs_
+        if self.include_intercept_:
+            self.coefs_ = np.zeros(X.shape[1])
+        else:
+            self.coefs_ = np.zeros(X.shape[1]-1)
+        for _ in range(self.max_iter_):
+            b, self.coefs_ = inner_step()
+            if not b:
+                return
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
         Predict responses for given samples using fitted estimator
-
         Parameters
         ----------
         X : ndarray of shape (n_samples, n_features)
@@ -89,7 +107,15 @@ class Perceptron(BaseEstimator):
         responses : ndarray of shape (n_samples, )
             Predicted responses of given samples
         """
-        raise NotImplementedError()
+
+        # def my_sign(x):
+        #     return 1 if x > 0 else 0
+        if self.include_intercept_:
+            extra_col = np.ones((len(X), 1))
+            X = np.hstack((extra_col, X))
+        pred_y = np.matmul(X, self.coefs_)
+        return np.sign(pred_y)
+        # return np.array([my_sign(xi) for xi in pred_y])
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
         """
@@ -109,4 +135,4 @@ class Perceptron(BaseEstimator):
             Performance under missclassification loss function
         """
         from ...metrics import misclassification_error
-        raise NotImplementedError()
+        return misclassification_error(y, self._predict(X))

@@ -3,17 +3,17 @@ import numpy as np
 import pandas as pd
 
 # Imports and settings for plotting of graphs
-import plotly.io as pio
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
-import plotly.express as px
+# import plotly.io as pio
+# import plotly.graph_objects as go
+# from plotly.subplots import make_subplots
+# import plotly.express as px
 
-pio.templates["custom"] = go.layout.Template(
-    layout=go.Layout(
-        margin=dict(l=20, r=20, t=40, b=0)
-    )
-)
-pio.templates.default = "simple_white+custom"
+# pio.templates["custom"] = go.layout.Template(
+#     layout=go.Layout(
+#         margin=dict(l=20, r=20, t=40, b=0)
+#     )
+# )
+# pio.templates.default = "simple_white+custom"
 
 
 class AnimationButtons():

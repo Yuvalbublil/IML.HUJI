@@ -1,8 +1,10 @@
 from IMLearn.learners.classifiers import Perceptron, LDA, GaussianNaiveBayes
 from typing import Tuple
 from utils import *
-import plotly.graph_objects as go
-from plotly.subplots import make_subplots
+from os import path
+# import plotly.graph_objects as go
+# from plotly.subplots import make_subplots
+from matplotlib import pyplot as plt
 from math import atan2, pi
 
 
@@ -36,16 +38,26 @@ def run_perceptron():
     Create a line plot that shows the perceptron algorithm's training loss values (y-axis)
     as a function of the training iterations (x-axis).
     """
-    for n, f in [("Linearly Separable", "linearly_separable.npy"), ("Linearly Inseparable", "linearly_inseparable.npy")]:
+    for n, f in [("Linearly Separable", "linearly_separable.npy"),
+                 ("Linearly Inseparable", "linearly_inseparable.npy")]:
         # Load dataset
-        raise NotImplementedError()
-
+        X, y = load_dataset(path.join(r"C:\Users\t8864522\Documents\GitHub\IML.HUJI\datasets\\", f))
         # Fit Perceptron and record loss in each fit iteration
         losses = []
-        raise NotImplementedError()
 
+        def in_callable(p1: Perceptron, x1: np.ndarray, y1: int) -> None:
+            losses.append(p1._loss(X, y))
+
+        p = Perceptron(callback=in_callable)
+        p.fit(X, y)
+        # print(p.predict(X))
+        print(p.coefs_)
         # Plot figure of loss as function of fitting iteration
-        raise NotImplementedError()
+        plt.plot(np.arange(1, len(losses) + 1, 1), losses)
+        plt.title(f"the loss over iterations on the {n} dataset.")
+        plt.ylabel("Loss")
+        plt.xlabel("number of iterations")
+        plt.show()
 
 
 def get_ellipse(mu: np.ndarray, cov: np.ndarray):
@@ -103,4 +115,4 @@ def compare_gaussian_classifiers():
 if __name__ == '__main__':
     np.random.seed(0)
     run_perceptron()
-    compare_gaussian_classifiers()
+    # compare_gaussian_classifiers()
