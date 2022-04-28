@@ -53,7 +53,7 @@ class LDA(BaseEstimator):
         self.mu_ = np.zeros(shape=(n_classes, n_features))
         for k in range(len(self.classes_)):
             indexs = np.where(y == self.classes_[k])[0]
-            exact_x = np.zeros(len(indexs))
+            exact_x = np.zeros((len(indexs), len(X[0])))
             for i in range(len(indexs)):
                 exact_x[i] = X[indexs[i]]
             exact_x_tran = exact_x.transpose()
@@ -61,11 +61,11 @@ class LDA(BaseEstimator):
                 self.mu_[k][f] += np.average(exact_x_tran[f])
 
         self.cov_ = np.zeros(shape=(n_features, n_features))
-        mu_t = self.mu_.transpose()
+        mu_t = self.mu_
         for i in range(len(X)):
             k = y[i]
             k_index = np.where(self.classes_ == k)[0]
-            self.cov_ = self.cov_ + np.matmul(X[i] - mu_t[k_index], (X[i] - mu_t[k_index]).transpose())
+            self.cov_ = self.cov_ + np.outer(X[i] - mu_t[k_index], (X[i] - mu_t[k_index]))
         self.cov_ = np.divide(self.cov_, len(X) - n_classes)
         self._cov_inv = inv(self.cov_)
         self.pi_ = np.zeros(n_classes)
@@ -95,8 +95,8 @@ class LDA(BaseEstimator):
             max_value = None
             for k in range(len(self.classes_)):
                 a: np.ndarray = np.matmul(self._cov_inv, self.mu_[k])
-                b = np.log(self.pi_[k]) - 0.5 * np.matmul(np.matmul(self.mu_[k], self._cov_inv), self.mu_[k])
-                value = np.matmul(a.transpose(), X[i]) + b
+                b = np.log(self.pi_[k]) - 0.5 * np.inner(self.mu_[k], np.matmul(self._cov_inv, self.mu_[k]))
+                value = np.inner(a, X[i]) + b
                 if max_value is None or value > max_value:
                     max_value = value
                     max_index = k
@@ -125,7 +125,8 @@ class LDA(BaseEstimator):
         for i in range(len(X)):
             for j in range(len(self.classes_)):
                 l[i, j] = np.log(self.pi_[j]) - 0.5 * n_features * np.log(2 * np.pi) - 0.5 * np.log(
-                    det(self.cov_)) - 0.5 * np.matmul(np.matmul((X[i]-self.mu_[j]).transpose(), self._cov_inv), X[i]-self.mu_[j])
+                    det(self.cov_)) - 0.5 * np.matmul(np.matmul((X[i] - self.mu_[j]).transpose(), self._cov_inv),
+                                                      X[i] - self.mu_[j])
         return l
 
     def _loss(self, X: np.ndarray, y: np.ndarray) -> float:
