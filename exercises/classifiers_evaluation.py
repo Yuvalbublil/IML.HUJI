@@ -103,33 +103,35 @@ def compare_gaussian_classifiers():
         # on the right. Plot title should specify dataset used and subplot titles should specify algorithm and accuracy
         # Create subplots
         from IMLearn.metrics import accuracy
-        fig = make_subplots(1, 2, subplot_titles=(f"LDA with accuracy of {accuracy(y, y_pred_lda)}", f"Bayes with accuracy of "
-                                                                                           f"{accuracy(y, y_pred_b)}"))
+        fig = make_subplots(1, 2, subplot_titles=( f"Bayes with "
+                                                                                                        f"accuracy of "
+                                                                                           f""
+                                                                                                         f""
+                                                   f"{accuracy(y, y_pred_b):.5f}", f"LDA with accuracy of {accuracy(y, y_pred_lda):.5f}"))
         fig.update_layout(showlegend=False, title_text=f"analyzing the data from {f}")
         fig.add_trace(go.Scatter(x=X[:, 0], y=X[:, 1], mode='markers', marker=dict(color=y_pred_lda,
-                                                                                         symbol=y)), 1, 1)
+                                                                                         symbol=y)), 1, 2)
 
 
         fig.add_trace(go.Scatter(x=X[:, 0], y=X[:, 1], mode='markers', marker=dict(color=y_pred_b,
-                                                                                         symbol=y)), 1, 2)
+                                                                                         symbol=y)), 1, 1)
 
-        # raise NotImplementedError()
         #
         # # Add traces for data-points setting symbols and colors
 
         #
         # # Add `X` dots specifying fitted Gaussians' means
-        for col in [1, 2]:
+        for col in [2, 1]:
             for center in range(len(lda.mu_)):
                 fig.add_trace(go.Scatter(x=[lda.mu_[center][0]], y=[lda.mu_[center][1]], mode='markers',
                                          marker_color="black",
                                          marker_symbol=4, marker_size=10), col=col, row=1)
         #
         # # Add ellipses depicting the covariances of the fitted Gaussians
-        for col, mu, cov in [(1, lda.mu_, lda.cov_), (2, bayes.mu_, bayes.vars_)]:
+        for col, mu, cov in [(2, lda.mu_, lda.cov_), (1, bayes.mu_, bayes.vars_)]:
             var = cov
             for center in range(len(lda.mu_)):
-                if col == 2:
+                if col == 1:
                     cov = np.diag(var[center])
                 fig.add_trace(get_ellipse(mu[center], cov), col=col, row=1)
         fig.show()
@@ -137,5 +139,5 @@ def compare_gaussian_classifiers():
 
 if __name__ == '__main__':
     np.random.seed(0)
-    # run_perceptron()
+    run_perceptron()
     compare_gaussian_classifiers()
