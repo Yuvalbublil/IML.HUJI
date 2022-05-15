@@ -70,7 +70,6 @@ class GaussianNaiveBayes(BaseEstimator):
         for i in range(n_classes):
             self.pi_[i] = self.pi_[i] / len(X)
 
-
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
         Predict responses for given samples using fitted estimator
@@ -90,7 +89,6 @@ class GaussianNaiveBayes(BaseEstimator):
         c = np.argmax(l, axis=1)
         map(lambda x: self.classes_[x], c)
         return c
-
 
     def likelihood(self, X: np.ndarray) -> np.ndarray:
         """

@@ -54,7 +54,7 @@ def run_perceptron():
         p.fit(X, y)
         # Plot figure of loss as function of fitting iteration
         plt.plot(np.arange(1, len(losses) + 1, 1), losses)
-        plt.title(f"the loss over iterations on the {n} dataset.")
+        plt.title(f"the loss over iterations on the {n} dataset.\n with {len(losses)} iterations")
         plt.ylabel("Loss")
         plt.xlabel("number of iterations")
         plt.show()
