@@ -58,9 +58,6 @@ class AdaBoost(BaseEstimator):
             self.D_[t] = D
             self.models.append(self.wl_())
             self.models[-1].fit(X, y * D)
-            if t == 0:
-                print(self.models[0].loss(X, y))
-                pass
             epsilon = weighted_misclassification_error(y*D, self.models[-1].predict(X))
             w = 0.5 * np.log(1 / epsilon - 1)
             self.weights_[t] = w

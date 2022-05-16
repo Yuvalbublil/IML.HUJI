@@ -60,10 +60,44 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
     # Question 2: Plotting decision surfaces
     T = [5, 50, 100, 250]
     lims = np.array([np.r_[train_X, test_X].min(axis=0), np.r_[train_X, test_X].max(axis=0)]).T + np.array([-.1, .1])
-    raise NotImplementedError()
+    symbols = np.array(["circle", "x"])
+    fig = make_subplots(rows=2, cols=2, subplot_titles=[rf"$\textbf{{{m}}} Iterations$" for m in T],
+                        horizontal_spacing=0.01, vertical_spacing=.03)
+    for i, t in enumerate(T):
+        fig.add_traces([decision_surface(lambda x: boost.partial_predict(x, t), lims[0], lims[1], showscale=False),
+                        go.Scatter(x=test_X[:, 0], y=test_X[:, 1], mode="markers", showlegend=False,
+                                   marker=dict(color=test_y, symbol=symbols[((test_y+1)//2).astype(int)], colorscale=[
+                                                                                                                          custom[0],
+                                                                                                    custom[-1]],
+                                               line=dict(color="black", width=1)))],
+                       rows=(i // 2) + 1, cols=(i % 2) + 1)
+    title = "Different iterations"
+    fig.update_layout(title=rf"$\textbf{{(2) Decision Boundaries Of Models - {title} Dataset}}$", margin=dict(t=100)) \
+        .update_xaxes(visible=False).update_yaxes(visible=False)
+    fig.show()
+
 
     # Question 3: Decision surface of best performing ensemble
-    raise NotImplementedError()
+
+    min_iter = np.argmin(test_err) + 1
+    T = [min_iter]
+    accuracy = 1 - boost.partial_loss(test_X, test_y, min_iter)
+    fig = make_subplots(rows=1, cols=1, subplot_titles=[f"${m} Iterations and {accuracy} accuracy$" for m in T],
+                        horizontal_spacing=0.01, vertical_spacing=.03)
+    for i, t in enumerate(T):
+        fig.add_traces([decision_surface(lambda x: boost.partial_predict(x, t), lims[0], lims[1], showscale=False),
+                        go.Scatter(x=test_X[:, 0], y=test_X[:, 1], mode="markers", showlegend=False,
+                                   marker=dict(color=test_y, symbol=symbols[((test_y + 1) // 2).astype(int)],
+                                               colorscale=[
+                                                   custom[0],
+                                                   custom[-1]],
+                                               line=dict(color="black", width=1)))],
+                       rows=(i // 1) + 1, cols=(i % 1) + 1)
+    title = "Best ensemble:"
+    fig.update_layout(title=rf"$\textbf{{(2) Decision Boundaries Of Models - {title} Dataset}}$", margin=dict(t=100)) \
+        .update_xaxes(visible=False).update_yaxes(visible=False)
+    fig.show()
+
 
     # Question 4: Decision surface with weighted samples
     raise NotImplementedError()
