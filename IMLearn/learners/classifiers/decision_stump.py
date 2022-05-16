@@ -47,11 +47,12 @@ class DecisionStump(BaseEstimator):
         x_tran = X.transpose()
         err = np.zeros((n_features, 2))
         thr = np.zeros((n_features, 2))
-        for f in x_tran:
-            thr[f, 0], err[f, 0] = self._find_threshold(f, y, -1)
-            thr[f, 1], err[f, 1] = self._find_threshold(f, y, 1)
+        for f in range(len(x_tran)):
+            thr[f, 0], err[f, 0] = self._find_threshold(x_tran[f], y, -1)
+            thr[f, 1], err[f, 1] = self._find_threshold(x_tran[f], y, 1)
         self.j_, self.sign_ = np.unravel_index(np.argmin(err, axis=None), err.shape)
-        self.threshold_ = thr[self.j_, (1 + self.sign_)/2]
+        self.threshold_ = thr[self.j_][self.sign_]
+        self.sign_ = -1 + 2* self.sign_
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -113,20 +114,28 @@ class DecisionStump(BaseEstimator):
         For every tested threshold, values strictly below threshold are predicted as `-sign` whereas values
         which equal to or above the threshold are predicted as `sign`
         """
+        a_pred = np.ones(len(labels)) * sign
 
-        def mini_pred(X, thr):
-            x_tran = X.transpose()
-            x_j = x_tran
+        a = np.dstack((values, labels))[0]
+        b = a[a[:, 0].argsort()]
+        values = b.T[0]
+        labels = b.T[1]
+        def mini_pred(X, thr, i):
+            # x_tran = X.transpose()
+            # x_j = x_tran
+            if i == 0:
+                return a_pred
 
             def apply(x):
                 return sign if x >= thr else -sign
 
-            return np.array(list(map(apply, x_j)))
+            a_pred[i - 1] = -sign
+            return a_pred
 
         test_values = np.hstack((values, np.array([values[-1].item() + EPSILON], dtype=object)))
         thr_err = np.zeros(len(test_values))
         for i in range(len(test_values)):
-            thr_err[i] = weighted_misclassification_error(labels, mini_pred(values, test_values[i]))
+            thr_err[i] = weighted_misclassification_error(labels, mini_pred(values, test_values[i], i))
         min_ind = np.argmin(thr_err)
         return test_values[min_ind], thr_err[min_ind]
 

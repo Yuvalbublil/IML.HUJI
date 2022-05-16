@@ -52,16 +52,19 @@ class AdaBoost(BaseEstimator):
         self.models = list()
         n_samples = len(X)
         self.weights_ = np.zeros(self.iterations_)
-        self.D_ = list()
+        self.D_ = np.zeros((self.iterations_, n_samples))
         D = np.ones(n_samples) / n_samples
         for t in range(self.iterations_):
-            self.D_.append(D)
+            self.D_[t] = D
             self.models.append(self.wl_())
             self.models[-1].fit(X, y * D)
-            epsilon = weighted_misclassification_error(self.models[-1].predict(X), y * D)
+            if t == 0:
+                print(self.models[0].loss(X, y))
+                pass
+            epsilon = weighted_misclassification_error(y*D, self.models[-1].predict(X))
             w = 0.5 * np.log(1 / epsilon - 1)
             self.weights_[t] = w
-            D = D * np.exp(-y * w * self.predict(X))
+            D = D * np.exp(-y * w * self.models[t].predict(X))
             sum_D = np.sum(D)
             D = D / sum_D
 
@@ -121,8 +124,8 @@ class AdaBoost(BaseEstimator):
             raise ValueError("T can't be greater the iterations")
         n_samples = len(X)
         pred = np.ndarray((T, n_samples))
-        for t in range(T):
-            pred[t] = self.models[t].predict(X)
+        for t in range(1, T+1):
+            pred[t-1] = self.models[t-1].predict(X)
         pred_t = pred.T
         y_pred = np.zeros(n_samples)
         for i in range(n_samples):

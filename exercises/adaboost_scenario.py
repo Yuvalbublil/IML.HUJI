@@ -47,11 +47,14 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
     train_err = np.zeros(n_learners)
     test_err = np.zeros(n_learners)
     for t in range(n_learners):
-        train_err[t] = boost.partial_loss(train_X, train_y, t)
-        test_err[t] = boost.partial_loss(test_X, test_y, t)
-    t_arr = np.arange(0,n_learners)
+        train_err[t] = boost.partial_loss(train_X, train_y, t+1)
+        test_err[t] = boost.partial_loss(test_X, test_y, t+1)
+    t_arr = np.arange(1, n_learners+1)
     plt.plot(t_arr, train_err)
     plt.plot(t_arr, test_err)
+    plt.legend(["train", "test"])
+    plt.ylabel("loss")
+    plt.xlabel("iterations")
     plt.show()
 
     # Question 2: Plotting decision surfaces
@@ -68,4 +71,4 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
 
 if __name__ == '__main__':
     np.random.seed(0)
-    fit_and_evaluate_adaboost(0, 1)
+    fit_and_evaluate_adaboost(0, 250)

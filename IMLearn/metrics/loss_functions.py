@@ -1,5 +1,5 @@
 import numpy as np
-
+from numba import jit
 
 def mean_square_error(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """
@@ -18,7 +18,7 @@ def mean_square_error(y_true: np.ndarray, y_pred: np.ndarray) -> float:
     """
     return np.mean(np.power(y_true - y_pred, 2)).item()
 
-
+@jit(nopython=True)
 def misclassification_error(y_true: np.ndarray, y_pred: np.ndarray, normalize: bool = True) -> float:
     """
     Calculate misclassification loss
@@ -42,7 +42,7 @@ def misclassification_error(y_true: np.ndarray, y_pred: np.ndarray, normalize: b
             sumy += 1
     return sumy / len(y_true) if normalize else sumy
 
-
+@jit(nopython=True)
 def weighted_misclassification_error(y_true: np.ndarray, y_pred: np.ndarray, normalize: bool = True) -> float:
     """
     Calculate misclassification loss
@@ -63,7 +63,7 @@ def weighted_misclassification_error(y_true: np.ndarray, y_pred: np.ndarray, nor
     sumy = 0
     for i in range(len(y_true)):
         if np.sign(y_true[i]) != np.sign(y_pred[i]):
-            sumy += np.abs(y_pred[i]).item()
+            sumy += np.abs(y_true[i]).item()
     return sumy / np.sum(np.abs(y_true)) if normalize else sumy
 
 
