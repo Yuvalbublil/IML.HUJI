@@ -2,7 +2,7 @@ from __future__ import annotations
 from typing import Tuple, NoReturn
 from ...base import BaseEstimator
 import numpy as np
-from ...metrics import misclassification_error
+from ...metrics import weighted_misclassification_error
 from itertools import product
 
 EPSILON = 1
@@ -126,7 +126,7 @@ class DecisionStump(BaseEstimator):
         test_values = np.hstack(values, np.ndarray([values[-1] + EPSILON]))
         thr_err = np.zeros(len(test_values))
         for i in range(len(test_values)):
-            thr_err[i] = misclassification_error(labels, mini_pred(values, test_values[i]))
+            thr_err[i] = weighted_misclassification_error(labels, mini_pred(values, test_values[i]))
         min_ind = np.argmin(thr_err)
         return test_values[min_ind], thr_err[min_ind]
 
@@ -147,4 +147,4 @@ class DecisionStump(BaseEstimator):
         loss : float
             Performance under missclassification loss function
         """
-        return misclassification_error(y, self.predict(X))
+        return weighted_misclassification_error(y, self.predict(X))

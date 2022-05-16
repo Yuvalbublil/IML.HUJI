@@ -38,9 +38,33 @@ def misclassification_error(y_true: np.ndarray, y_pred: np.ndarray, normalize: b
     """
     sumy = 0
     for i in range(len(y_true)):
-        if y_true[i]!=y_pred[i]:
+        if y_true[i] != y_pred[i]:
             sumy += 1
     return sumy / len(y_true) if normalize else sumy
+
+
+def weighted_misclassification_error(y_true: np.ndarray, y_pred: np.ndarray, normalize: bool = True) -> float:
+    """
+    Calculate misclassification loss
+
+    Parameters
+    ----------
+    y_true: ndarray of shape (n_samples, )
+        True response values
+    y_pred: ndarray of shape (n_samples, )
+        Predicted response values
+    normalize: bool, default = True
+        Normalize by number of samples or not
+
+    Returns
+    -------
+    Misclassification of given predictions
+    """
+    sumy = 0
+    for i in range(len(y_true)):
+        if np.sign(y_true[i]) != np.sign(y_pred[i]):
+            sumy += np.abs(y_pred)
+    return sumy / np.sum(np.abs(y_true)) if normalize else sumy
 
 
 def accuracy(y_true: np.ndarray, y_pred: np.ndarray) -> float:
