@@ -5,7 +5,7 @@ import numpy as np
 from ...metrics import weighted_misclassification_error
 from itertools import product
 
-EPSILON = 1
+EPSILON = 1.0
 
 
 class DecisionStump(BaseEstimator):
@@ -48,10 +48,10 @@ class DecisionStump(BaseEstimator):
         err = np.zeros((n_features, 2))
         thr = np.zeros((n_features, 2))
         for f in x_tran:
-            thr[f, 0], err[f, 0] = self._find_threshold(f, y, 0)
+            thr[f, 0], err[f, 0] = self._find_threshold(f, y, -1)
             thr[f, 1], err[f, 1] = self._find_threshold(f, y, 1)
         self.j_, self.sign_ = np.unravel_index(np.argmin(err, axis=None), err.shape)
-        self.threshold_ = thr[self.j_, self.sign_]
+        self.threshold_ = thr[self.j_, (1 + self.sign_)/2]
 
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
@@ -123,7 +123,7 @@ class DecisionStump(BaseEstimator):
 
             return np.array(list(map(apply, x_j)))
 
-        test_values = np.hstack(values, np.ndarray([values[-1] + EPSILON]))
+        test_values = np.hstack((values, np.array([values[-1].item() + EPSILON], dtype=object)))
         thr_err = np.zeros(len(test_values))
         for i in range(len(test_values)):
             thr_err[i] = weighted_misclassification_error(labels, mini_pred(values, test_values[i]))

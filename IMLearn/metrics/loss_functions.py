@@ -63,7 +63,7 @@ def weighted_misclassification_error(y_true: np.ndarray, y_pred: np.ndarray, nor
     sumy = 0
     for i in range(len(y_true)):
         if np.sign(y_true[i]) != np.sign(y_pred[i]):
-            sumy += np.abs(y_pred)
+            sumy += np.abs(y_pred[i]).item()
     return sumy / np.sum(np.abs(y_true)) if normalize else sumy
 
 

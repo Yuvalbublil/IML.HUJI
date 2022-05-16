@@ -126,7 +126,7 @@ class AdaBoost(BaseEstimator):
         pred_t = pred.T
         y_pred = np.zeros(n_samples)
         for i in range(n_samples):
-            y_pred[i] = np.sum(pred_t[i] * self.weights_[:T])
+            y_pred[i] = np.sign(np.sum(pred_t[i] * self.weights_[:T]))
         return y_pred
 
     def partial_loss(self, X: np.ndarray, y: np.ndarray, T: int) -> float:
