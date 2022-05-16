@@ -7,6 +7,9 @@ import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from matplotlib import pyplot as plt
 
+SIZE_CONSTANT = 5
+
+
 def generate_data(n: int, noise_ratio: float) -> Tuple[np.ndarray, np.ndarray]:
     """
     Generate a dataset in R^2 of specified size
@@ -72,7 +75,7 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
                                                line=dict(color="black", width=1)))],
                        rows=(i // 2) + 1, cols=(i % 2) + 1)
     title = "Different iterations"
-    fig.update_layout(title=rf"$\textbf{{(2) Decision Boundaries Of Models - {title} Dataset}}$", margin=dict(t=100)) \
+    fig.update_layout(title=rf"$\textbf{{ Decision Boundaries Of Models - {title} Dataset}}$", margin=dict(t=100)) \
         .update_xaxes(visible=False).update_yaxes(visible=False)
     fig.show()
 
@@ -94,13 +97,30 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
                                                line=dict(color="black", width=1)))],
                        rows=(i // 1) + 1, cols=(i % 1) + 1)
     title = "Best ensemble:"
-    fig.update_layout(title=rf"$\textbf{{(2) Decision Boundaries Of Models - {title} Dataset}}$", margin=dict(t=100)) \
+    fig.update_layout(title=rf"$\textbf{{ Decision Boundaries Of Models - {title} Dataset}}$", margin=dict(t=100)) \
         .update_xaxes(visible=False).update_yaxes(visible=False)
     fig.show()
 
 
     # Question 4: Decision surface with weighted samples
-    raise NotImplementedError()
+    max = np.max(boost.D_[-1])
+    sizes = boost.D_[-1] / max * SIZE_CONSTANT
+    fig = make_subplots(rows=1, cols=1, subplot_titles=[f"$250 Iterations with weighted samples$"],
+                        horizontal_spacing=0.01, vertical_spacing=.03)
+    fig.add_traces([decision_surface(boost.predict, lims[0], lims[1], showscale=False),
+                    go.Scatter(x=test_X[:, 0], y=test_X[:, 1], mode="markers", showlegend=False,
+                               marker=dict(color=test_y, symbol=symbols[((test_y + 1) // 2).astype(int)],
+                                           size=sizes,
+                                           colorscale=[
+                                               custom[0],
+                                               custom[-1]],
+                                           line=dict(color="black", width=1)))],
+                   rows=1, cols=1)
+    title = "weighted samples"
+    fig.update_layout(title=rf"$\textbf{{ Decision Boundaries Of Models - {title} Dataset}}$", margin=dict(t=100)) \
+        .update_xaxes(visible=False).update_yaxes(visible=False)
+    fig.show()
+
 
 
 if __name__ == '__main__':
