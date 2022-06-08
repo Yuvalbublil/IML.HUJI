@@ -55,6 +55,7 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
     t_arr = np.arange(1, n_learners+1)
     plt.plot(t_arr, train_err)
     plt.plot(t_arr, test_err)
+    plt.title(f"noise = {noise}")
     plt.legend(["train", "test"])
     plt.ylabel("loss")
     plt.xlabel("iterations")
@@ -125,4 +126,5 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
 
 if __name__ == '__main__':
     np.random.seed(0)
-    fit_and_evaluate_adaboost(0, 250)
+    fit_and_evaluate_adaboost(0)
+    fit_and_evaluate_adaboost(0.4)
