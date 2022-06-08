@@ -86,25 +86,24 @@ def select_regularization_parameter(n_samples: int = 50, n_evaluations: int = 50
     x, y = datasets.load_diabetes(return_X_y=True)
     train_x, train_y, test_x, test_y = split_train_test(x, y, n_samples / len(x))
 
-
     # Question 7 - Perform CV for different values of the regularization parameter for Ridge and Lasso regressions
-    lam = np.linspace(0.0001,2, n_evaluations)
+    lam = np.linspace(0.002, 2, n_evaluations)
     ridge_error_train = np.zeros(n_evaluations)
     ridge_error_test = np.zeros(n_evaluations)
     lasso_error_train = np.zeros(n_evaluations)
     lasso_error_test = np.zeros(n_evaluations)
 
     for i, l in enumerate(lam):
-        ridge_error_train[i] , ridge_error_test[i] = cross_validate(RidgeRegression(l), train_x, train_y,
-                                                                  mean_square_error)
+        ridge_error_train[i], ridge_error_test[i] = cross_validate(RidgeRegression(l), train_x, train_y,
+                                                                   mean_square_error)
         lasso_error_train[i], lasso_error_test[i] = cross_validate(Lasso(l), train_x, train_y, mean_square_error)
 
     plt.plot(lam, ridge_error_train)
-    plt.plot(lam,ridge_error_test)
+    plt.plot(lam, ridge_error_test)
     plt.plot(lam, lasso_error_train)
     plt.plot(lam, lasso_error_test)
 
-    plt.legend(["ridge error train", "ridge error test","lasso error train","lasso error test"])
+    plt.legend(["ridge error train", "ridge error test", "lasso error train", "lasso error test"])
     plt.show()
 
     # Question 8 - Compare best Ridge model, best Lasso model and Least Squares model
