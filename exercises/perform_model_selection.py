@@ -104,15 +104,28 @@ def select_regularization_parameter(n_samples: int = 50, n_evaluations: int = 50
     plt.plot(lam, lasso_error_test)
 
     plt.legend(["ridge error train", "ridge error test", "lasso error train", "lasso error test"])
+    plt.title("testing different models with different regularization factor")
     plt.show()
 
     # Question 8 - Compare best Ridge model, best Lasso model and Least Squares model
-    raise NotImplementedError()
+    a = lam[np.argmin(lasso_error_test)]
+    l = lam[np.argmin(ridge_error_test)]
+    print("-" * 40)
+    print(f"alpha = {a} and lamda = {l}")
+    lin = LinearRegression()
+    lasso = Lasso(a)
+    ridge = RidgeRegression(l)
+    ridge.fit(train_x,train_y)
+    lasso.fit(train_x,train_y)
+    lin.fit(train_x, train_y)
+    print(f"ridge test error\t {ridge.loss(test_x, test_y)}")
+    print(f"lasso test error\t {mean_square_error(lasso.predict(test_x), test_y)}")
+    print(f"lin test error\t\t {lin.loss(test_x, test_y)}")
 
 
 if __name__ == '__main__':
     np.random.seed(0)
     select_polynomial_degree()
-    # select_polynomial_degree(noise=0)
-    # select_polynomial_degree(1500, 10)
+    select_polynomial_degree(noise=0)
+    select_polynomial_degree(1500, 10)
     select_regularization_parameter()
