@@ -111,3 +111,19 @@ if __name__ == '__main__':
     y_pred = np.array(
         [199000.37562541, 452589.25533196, 345267.48129011, 345856.57131275, 563867.1347574, 395102.94362135])
     print(mean_square_error(y_true, y_pred))
+
+
+def softmax(X: np.ndarray) -> np.ndarray:
+    """
+    Compute the Softmax function for each sample in given data
+
+    Parameters:
+    -----------
+    X: ndarray of shape (n_samples, n_features)
+
+    Returns:
+    --------
+    output: ndarray of shape (n_samples, n_features)
+        Softmax(x) for every sample x in given data X
+    """
+    raise NotImplementedError()
